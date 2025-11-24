@@ -1,0 +1,43 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    container_name: django_api
+    command: /app/docker/django-entrypoint.sh
+    ports:
+      - "8000:8000"
+
+    # ❗ Removed: "- .:/app" (this was breaking static files)
+    volumes:
+      - static_volume:/app/staticfiles
+
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: social_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
