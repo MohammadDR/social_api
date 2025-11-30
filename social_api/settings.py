@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'social_api.wsgi.application'
 
 import os
 
-USE_DOCKER = os.getenv('USE_DOCKER') == "1"
+USE_DOCKER = os.getenv("USE_DOCKER") == "1"
 
 if USE_DOCKER:
     DATABASES = {
@@ -103,17 +103,22 @@ if USE_DOCKER:
             'NAME': os.getenv('POSTGRES_DB'),
             'USER': os.getenv('POSTGRES_USER'),
             'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-            'HOST': os.getenv('POSTGRES_HOST', 'db'),
+            'HOST': os.getenv('POSTGRES_HOST', 'db'),  # Docker-only
             'PORT': os.getenv('POSTGRES_PORT', '5432'),
         }
     }
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+            'HOST': os.getenv('POSTGRES_HOST'),
+            'PORT': os.getenv('POSTGRES_PORT'),
         }
     }
+
 
 
 
