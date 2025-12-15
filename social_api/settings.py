@@ -93,31 +93,19 @@ WSGI_APPLICATION = 'social_api.wsgi.application'
 
 
 import os
+from pathlib import Path
+import dj_database_url
 
-USE_DOCKER = os.getenv("USE_DOCKER") == "1"
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-if USE_DOCKER:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB'),
-            'USER': os.getenv('POSTGRES_USER'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-            'HOST': os.getenv('POSTGRES_HOST', 'db'),  # Docker-only
-            'PORT': os.getenv('POSTGRES_PORT', '5432'),
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB'),
-            'USER': os.getenv('POSTGRES_USER'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-            'HOST': os.getenv('POSTGRES_HOST'),
-            'PORT': os.getenv('POSTGRES_PORT'),
-        }
-    }
+DATABASES = {
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
+}
+
 
 
 
